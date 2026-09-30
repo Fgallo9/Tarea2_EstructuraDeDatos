@@ -18,13 +18,16 @@ typedef struct {
 void mostrarMenuPrincipal() {
   limpiarPantalla();
   puts("========================================");
-  puts("      Base de Datos de Canciones");
+  puts("      Base de Datos de Canciones        ");
   puts("========================================");
   puts("1) Cargar Canciones");
   puts("2) Buscar por género de la canción");
   puts("3) Buscar por artista");
   puts("4) Buscar por tempo");
-  puts("5) Salir");
+  puts("5) Crear Lista de Reproduccion");
+  puts("6) Agregar Cancion a Lista");
+  puts("7) Mostrar Canciones de una Lista");
+  puts("8) Salir");
 }
 
 /**
@@ -214,12 +217,78 @@ void buscarPorTempo(Map *songTempo) {
     }
 }
 
+void crearListaReproduccion(Map *playlists) {
+    char nombreLista[100];
+    printf("Ingrese un nombre para la nueva lista de reproduccion: ");
+    scanf(" %[^\n]s", nombreLista);
+
+    if (map_search(playlists, nombreLista) != NULL) {
+        printf("Ya existe una lista con el nombre '%s'.\n", nombreLista);
+    } else {
+        List *nuevaLista = list_create();
+
+        char *claveNombre = (char *)malloc(strlen(nombreLista) + 1);
+        strcpy(claveNombre, nombreLista);
+
+        map_insert(playlists, claveNombre, nuevaLista);
+        printf("Lista '%s' creada exitosamente.\n", nombreLista);
+    }
+}
+
+void agregarCancionALista(Map *songId, Map *playlists) {
+    char nombreLista[100];
+    char idCancion[100];
+
+    printf("Ingrese el nombre de la lista de reproduccion: ");
+    scanf(" %[^\n]s", nombreLista);
+  
+    MapPair *pairLista = map_search(playlists, nombreLista);
+    if (pairLista == NULL) {
+        printf("La lista '%s' no existe.\n", nombreLista);
+        return;
+    }
+
+    printf("Ingrese el ID de la cancion a agregar: ");
+    scanf(" %[^\n]s", idCancion);
+
+    MapPair *pairCancion = map_search(songId, idCancion);
+    if (pairCancion == NULL) {
+        printf("La cancion con ID '%s' no existe.\n", idCancion);
+        return;
+    }
+
+    List *listaDestino = (List *)pairLista->value;
+    Song *cancionAAgregar = (Song *)pairCancion->value;
+
+    list_pushBack(listaDestino, cancionAAgregar);
+    printf("Cancion '%s' agregada exitosamente a '%s'.\n", cancionAAgregar->track_name, nombreLista);
+}
+
+void mostrarCancionesDeLista(Map *playlists) {
+    char nombreLista[100];
+    printf("Nombre de la lista de reproduccion a mostrar: ");
+    scanf(" %[^\n]s", nombreLista);
+
+    MapPair *pairLista = map_search(playlists, nombreLista);
+    if (pairLista == NULL) {
+        printf("La lista '%s' no existe.\n", nombreLista);
+        return;
+    }
+
+    printf("\nPlaylist: %s \n", nombreLista);
+    List *listaAMostrar = (List *)pairLista->value;
+
+    mostrarListaCanciones(listaAMostrar); 
+}
+
 int main() {
   char opcion; 
   Map *songId = map_create(is_equal_str);
   Map *songGenres = map_create(is_equal_str);
   Map *songArtist = map_create(is_equal_str);
   Map *songTempo = map_create(is_equal_str);
+  Map *playlists = map_create(is_equal_str);
+
   do {
     mostrarMenuPrincipal();
     printf("Ingrese su opción: ");
@@ -239,22 +308,33 @@ int main() {
         buscarPorTempo(songTempo);
         break;
       case '5':
+        crearListaReproduccion(playlists);
+        break;
+      case '6':
+        agregarCancionALista(songId, playlists);
+        break;
+      case '7':
+        mostrarCancionesDeLista(playlists);
+        break;
+      case '8':
         printf("Saliendo de Spotifind...\n");
         break;
       default:
         printf("Opcion no valida. Por favor intente de nuevo.\n");
-        }
-    
-    if (opcion != '5') {
+    }
+
+    if (opcion != '8') {
       presioneTeclaParaContinuar();
     }
-  
-  } while (opcion != '5');
 
+  } while (opcion != '8');
+
+  // Limpiamos la memoria de todos los mapas
   map_clean(songId);
   map_clean(songGenres);
   map_clean(songArtist);
   map_clean(songTempo);
+  map_clean(playlists);
 
   return 0;
 }
