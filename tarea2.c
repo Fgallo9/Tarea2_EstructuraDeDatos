@@ -323,9 +323,7 @@ int main() {
         printf("Opcion no valida. Por favor intente de nuevo.\n");
     }
 
-    if (opcion != '8') {
-      presioneTeclaParaContinuar();
-    }
+    if (opcion != '8') presioneTeclaParaContinuar();
 
   } while (opcion != '8');
 
