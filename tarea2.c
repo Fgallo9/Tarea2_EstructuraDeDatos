@@ -62,11 +62,11 @@ const char *obtenerCampo(char *linea, int numeroDeCampo) {
         // Disminuimos el contador hasta llegar al campo que queremos
         numeroDeCampo--;
         if (numeroDeCampo == 0) {
-            return campoActual; // Retornamos el campo encontrado
+            return campoActual;
         }
     }
 
-    return NULL; // Si no encuentra el campo, retorna nulo
+    return NULL;
 }
 
 void cargarCanciones(Map *songId, Map *songGenres, Map *songArtist, Map *songTempo) {
@@ -170,7 +170,7 @@ void buscarPorGenero(Map *songGenres){
   scanf(" %[^\n]s", generoBuscado);
   MapPair *resultado = map_search(songGenres, generoBuscado);
     if (resultado != NULL) {
-        mostrarListaCanciones((List *)resultado->value); // Llamas a tu función auxiliar
+        mostrarListaCanciones((List *)resultado->value);
     } else {
         printf("No se encontraron canciones.\n");
     }
@@ -327,7 +327,6 @@ int main() {
 
   } while (opcion != '8');
 
-  // Limpiamos la memoria de todos los mapas
   map_clean(songId);
   map_clean(songGenres);
   map_clean(songArtist);
