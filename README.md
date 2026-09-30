@@ -1,33 +1,119 @@
-En este *repl* puedes encontrar varios ejemplos que te pueden ayudar con las tareas de estructura.
+# Spotifind - Base de Datos de Canciones
 
-## Código de Ejemplo (tarea1)
-Para ejecutar el ejemplo tarea1 primero debemos compilar (en la carpeta raíz)
-````
-gcc tdas/*.c tarea1.c -Wno-unused-result -o tarea1
-````
+## Descripción
 
-Y luego ejecutar:
-````
-./tarea1
-````
+Esta aplicación en C permite gestionar una amplia base de datos de canciones cargadas desde un archivo CSV. Utilizando Tipos de Datos Abstractos (TDAs) como Mapas y Listas, Spotifind organiza la información en memoria para permitir búsquedas instantáneas y eficientes basadas en diferentes criterios musicales como el género, el artista y el tempo de la canción.
 
-## TDAs
-En la carpeta `tdas` se encuentran implementados distintos TDAs que puedes utilizar (lista, pila, cola, cola con prioridad y mapas). 
+## Cómo compilar y ejecutar el programa
 
-Las implementaciones no son las más eficientes (todas usan como estructura de datos una **lista enlazada**), por lo que puedes reemplazarlas por las que has realizado en los labs.
+1. **Descarga y descomprime** el archivo `.zip` del proyecto en una carpeta de tu preferencia.
 
-## Otros códigos (en carpeta examples)
-Para ejecutar los distintos ejemplos que hay en la carpeta `examples`, primero debes compilarlos. Si estamos en la carpeta raíz:
-````
-gcc tdas/*.c examples/example2_menu.c -Wno-unused-result -o example
-````
-Y luego ejecutarlos:
-````
-./example
-````
+### Opción 1: En Visual Studio Code
+1. Inicia **Visual Studio Code**.
+2. Selecciona `Archivo > Abrir carpeta...` y elige la carpeta donde descomprimiste el proyecto.
 
-Se incluyen los siguientes ejemplos:
-* `example1_list`: Uso del TDA Lista, inserción y eliminación de elementos.
-* `example2_menu`: Ejemplo de menú con submenús.
-* `example3_readcsv`: Ejemplo de lectura desde un archivo csv y almacenamiento en datos estructurados.
-* `example4_map`: Ejemplo de uso del TDA mapa.
+### Opción 2: En Replit
+1. Crea un nuevo repl o importa la carpeta del proyecto descomprimido.
+2. Asegúrate de que el archivo song_dataset_.csv esté subido en la raíz del proyecto.
+3. Abre la terminal de Replit (`Shell`).
+
+### Forma de compilación del codigo
+
+1. Compila el codigo escribiendo:
+   ```bash
+   gcc tdas/*.c tarea2.c -Wno-unused-result -o tarea2
+   ```
+2. Una vez compilado el programa escribe:
+   ```bash
+   ./tarea2
+   ```
+
+## Funcionalidades
+
+El sistema cuenta con las siguientes opciones operativas:
+1. Cargar Canciones: Carga en memoria todas las canciones desde el archivo song_dataset_.csv, indexándolas en mapas (por ID, género, artista y tempo) para búsquedas O(1).
+2. Buscar por género de la canción: Recibe el nombre de un género musical y muestra todas las canciones asociadas a este.
+3. Buscar por artista: Recibe el nombre de un artista o banda y despliega toda su discografía disponible en el sistema.
+4. Buscar por tempo: Permite al usuario clasificar y listar las canciones según su velocidad:
+    - Lentas (Menos de 80 BPM).
+    - Moderadas (Entre 80 y 120 BPM).
+    - Rápidas (Mayor a 120 BPM).
+5. Salir: Finaliza la ejecución del sistema de manera segura, liberando toda la memoria utilizada por los TDAs.
+
+## Ejemplo de uso
+
+**Inicio:** Muestra el menú principal, donde se puede acceder a todas las funciones del codigo.
+
+```
+========================================
+      Base de Datos de Canciones
+========================================
+1) Cargar Canciones
+2) Buscar por género de la canción
+3) Buscar por artista
+4) Buscar por tempo
+5) Salir
+Ingrese su opción:
+```
+
+**Paso 1:** El sistema lee el archivo CSV y distribuye la información en los mapas. Es requisito hacer esto antes de buscar.
+
+```
+Ingrese su opción: 1
+¡Se cargaron 1500 canciones exitosamente!
+Presione una tecla para continuar...
+```
+
+**Paso 2:** El usuario ingresa un género y el sistema busca instantáneamente en el mapa correspondiente todas las coincidencias.
+
+```
+Ingrese su opción: 2
+Por favor ingrese el genero a buscar: pop
+ID: 12345 | Cancion: Shape of You | Artista: Ed Sheeran | Tempo: 95
+ID: 67890 | Cancion: Blinding Lights | Artista: The Weeknd | Tempo: 171
+...
+Presione una tecla para continuar...
+```
+
+**Paso 3:** Busca un artista específico respetando los espacios en el nombre y muestra sus canciones.
+
+```
+Ingrese su opción: 3
+
+Ingrese su opción: 3
+Ingrese el nombre del artista: Queen
+ID: 11111 | Cancion: Bohemian Rhapsody | Artista: Queen | Tempo: 71
+ID: 22222 | Cancion: Don't Stop Me Now | Artista: Queen | Tempo: 156
+...
+Presione una tecla para continuar...
+```
+
+**Paso 4:** El usuario selecciona una categoría de velocidad y el programa filtra la música usando los rangos definidos.
+
+```
+Ingrese su opción: 4
+
+Seleccione la velocidad:
+1. Lentas (Menos de 80 BPM)
+2. Moderadas (Entre 80 y 120 BPM)
+3. Rapidas (Mayor a 120 BPM)
+Opcion: 1
+
+--- Mostrando Canciones Lentas ---
+ID: 11111 | Cancion: Bohemian Rhapsody | Artista: Queen | Tempo: 71
+...
+Presione una tecla para continuar...
+```
+
+**Paso 5:** Finaliza la ejecución del sistema, limpiando los TDAs y liberando la memoria.
+
+```
+Ingrese su opción: 5
+Saliendo de Spotifind...
+```
+
+## Contribuciones
+
+- **Ignacio Aracena:**
+
+- **Franco Gallo:**

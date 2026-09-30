@@ -40,7 +40,7 @@ void leer_canciones() {
     printf("Género: %s\n", campos[20]);
     printf("Tempo: %.2f\n", atof(campos[18]));
     printf(" -------------------------------\n");
-    
+
   }
   fclose(archivo); // Cierra el archivo después de leer todas las líneas
 
