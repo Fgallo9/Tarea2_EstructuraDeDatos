@@ -65,7 +65,6 @@ const char *obtenerCampo(char *linea, int numeroDeCampo) {
             return campoActual;
         }
     }
-
     return NULL;
 }
 

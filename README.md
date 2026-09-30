@@ -31,14 +31,15 @@ Esta aplicación en C permite gestionar una amplia base de datos de canciones ca
 ## Funcionalidades
 
 El sistema cuenta con las siguientes opciones operativas:
-1. Cargar Canciones: Carga en memoria todas las canciones desde el archivo song_dataset_.csv, indexándolas en mapas (por ID, género, artista y tempo) para búsquedas O(1).
+
+1. Cargar Canciones: Carga en memoria todas las canciones desde el archivo song_dataset_.csv.
 2. Buscar por género de la canción: Recibe el nombre de un género musical y muestra todas las canciones asociadas a este.
-3. Buscar por artista: Recibe el nombre de un artista o banda y despliega toda su discografía disponible en el sistema.
-4. Buscar por tempo: Permite al usuario clasificar y listar las canciones según su velocidad:
-    - Lentas (Menos de 80 BPM).
-    - Moderadas (Entre 80 y 120 BPM).
-    - Rápidas (Mayor a 120 BPM).
-5. Salir: Finaliza la ejecución del sistema de manera segura, liberando toda la memoria utilizada por los TDAs.
+3. Buscar por artista: Recibe el nombre de un artista o banda y despliega toda su discografía disponible.
+4. Buscar por tempo: Permite al usuario clasificar y listar las canciones según su velocidad (Lentas < 80 BPM, Moderadas 80-120 BPM, Rápidas > 120 BPM).
+5. Crear Lista de Reproducción: Permite al usuario crear una nueva colección vacía de canciones dándole un nombre personalizado.
+6. Agregar Canción a Lista: Permite añadir una canción específica (mediante su ID) a una lista de reproducción previamente creada.
+7. Mostrar Canciones de una Lista: Despliega todas las canciones almacenadas en una lista de reproducción personalizada específica.
+8. Salir: Finaliza la ejecución del sistema de manera segura, liberando toda la memoria utilizada por los TDAs.
 
 ## Ejemplo de uso
 
@@ -52,7 +53,11 @@ El sistema cuenta con las siguientes opciones operativas:
 2) Buscar por género de la canción
 3) Buscar por artista
 4) Buscar por tempo
-5) Salir
+5) Crear Lista de Reproduccion
+6) Agregar Cancion a Lista
+7) Mostrar Canciones de una Lista
+8) Salir
+
 Ingrese su opción:
 ```
 
@@ -105,10 +110,40 @@ ID: 11111 | Cancion: Bohemian Rhapsody | Artista: Queen | Tempo: 71
 Presione una tecla para continuar...
 ```
 
-**Paso 5:** Finaliza la ejecución del sistema, limpiando los TDAs y liberando la memoria.
+**Paso 5:** El usuario crea una nueva lista de reproducción personalizada ingresando un nombre único.
 
 ```
 Ingrese su opción: 5
+Ingrese un nombre para la nueva lista de reproduccion: Mis Favoritas
+Lista 'Mis Favoritas' creada exitosamente.
+Presione una tecla para continuar...
+```
+
+**Paso 6:** Se añade una canción específica a la lista recién creada utilizando el ID de la canción (el cual se puede obtener previamente de las búsquedas).
+
+```
+Ingrese su opción: 6
+Ingrese el nombre de la lista de reproduccion: Mis Favoritas
+Ingrese el ID de la cancion a agregar: 11111
+Cancion 'Bohemian Rhapsody' agregada exitosamente a 'Mis Favoritas'.
+Presione una tecla para continuar...
+```
+
+**Paso 7:** El sistema busca la lista de reproducción solicitada y despliega todas las canciones que el usuario ha guardado en ella.
+
+```
+Ingrese su opción: 7
+Nombre de la lista de reproduccion a mostrar: Mis Favoritas
+
+Playlist: Mis Favoritas 
+ID: 11111 | Cancion: Bohemian Rhapsody | Artista: Queen | Tempo: 71
+Presione una tecla para continuar...
+```
+
+**Paso 8:** Finaliza la ejecución del sistema, limpiando los TDAs y liberando la memoria.
+
+```
+Ingrese su opción: 8
 Saliendo de Spotifind...
 ```
 
