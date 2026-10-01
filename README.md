@@ -148,7 +148,16 @@ Saliendo de Spotifind...
 ```
 
 ## Contribuciones
+- **Ignacio Aracena:** 
+  - Lógica de lectura, extracción de datos y carga desde el archivo CSV.
+  - Implementación de la función de búsqueda por Género de la canción.
+  - Desarrollo de la lógica principal para crear y gestionar Listas de Reproducción.
+  - Manejo y correcta liberación de memoria de los TDAs al finalizar el programa.
 
-- **Ignacio Aracena:**
+- **Franco Gallo:** 
+  - Estructuración del Menú Principal y flujo de interacción con el usuario.
+  - Implementación de la función de búsqueda por Artista.
+  - Implementación de la lógica de clasificación y búsqueda por Tempo.
+  - Diseño de la función universal para la impresión estructurada de resultados en pantalla.
 
-- **Franco Gallo:**
+El readme fue desarrollado por ambas partes.
