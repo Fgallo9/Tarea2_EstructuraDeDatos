@@ -5,16 +5,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Declaramos la funcion del TDA para insercion directa.
+// Esto nos permite saltar la validacion de duplicados al cargar los IDs masivamente.
+void multimap_insert(Map *map, void *key, void *value);
+
 typedef struct {
   char id[100];
-  char artist[100];
-  char album_name[100];
-  char track_name[100];
+  char artist[1024];
+  char album_name[1024];
+  char track_name[1024];
   int tempo;
-  char track_genre[100];
+  char track_genre[1024];
 } Song;
 
-// Menú principal
 void mostrarMenuPrincipal() {
   limpiarPantalla();
   puts("========================================");
@@ -54,142 +57,118 @@ int is_equal_int(void *key1, void *key2) {
   return *(int *)key1 == *(int *)key2; // Compara valores enteros directamente
 }
 
-const char *obtenerCampo(char *linea, int numeroDeCampo) {
-    const char *campoActual;
+void cargarCanciones(Map *songId) {
+  printf("Iniciando carga masiva de archivo...\n");
+  fflush(stdout); 
 
-    // strtok va cortando la línea cada vez que encuentra una coma
-    for (campoActual = strtok(linea, ","); campoActual && *campoActual; campoActual = strtok(NULL, ",\n\r")) {
-        // Disminuimos el contador hasta llegar al campo que queremos
-        numeroDeCampo--;
-        if (numeroDeCampo == 0) {
-            return campoActual;
-        }
-    }
-    return NULL;
-}
-
-void cargarCanciones(Map *songId, Map *songGenres, Map *songArtist, Map *songTempo) {
-  FILE *archivo = fopen("song_dataset_.csv", "r");
+  FILE *archivo = fopen("data/song_dataset_.csv", "r");
   if (archivo == NULL) {
-    printf("Error al abrir el archivo. Asegúrate de que song_dataset_.csv esté en la carpeta.\n");  
+    printf("Error al abrir el archivo. Verifique la carpeta data.\n");  
     return;
   }
 
-  char linea[1024];
-  fgets(linea, 1024, archivo); // Saltamos la primera linea
+  char linea[4096];
+  fgets(linea, 4096, archivo); // Saltamos los encabezados
 
   int cargadas = 0;
-  while (fgets(linea, 1024, archivo) != NULL) {
+  while (fgets(linea, 4096, archivo) != NULL) {
       Song *nuevaCancion = (Song *)malloc(sizeof(Song));
       if (nuevaCancion == NULL) continue;
 
-      char lineaCopia[1024];
-
-      // Extraemos los datos
-      strcpy(lineaCopia, linea);
-      strcpy(nuevaCancion->id, obtenerCampo(lineaCopia, 1));
-
-      strcpy(lineaCopia, linea);
-      strcpy(nuevaCancion->artist, obtenerCampo(lineaCopia, 2));
-
-      strcpy(lineaCopia, linea);
-      strcpy(nuevaCancion->album_name, obtenerCampo(lineaCopia, 3));
-
-      strcpy(lineaCopia, linea);
-      strcpy(nuevaCancion->track_name, obtenerCampo(lineaCopia, 4));
-
-      strcpy(lineaCopia, linea);
-      const char* tempoStr = obtenerCampo(lineaCopia, 5);
-      nuevaCancion->tempo = tempoStr ? atoi(tempoStr) : 0;
-
-      strcpy(lineaCopia, linea);
-      const char* genreStr = obtenerCampo(lineaCopia, 6);
-      if (genreStr) strcpy(nuevaCancion->track_genre, genreStr);
-
-      // Insertar en Mapa ID
-      map_insert(songId, nuevaCancion->id, nuevaCancion);
-
-      // Insertar en Mapa Géneros
-      MapPair *pairGenero = map_search(songGenres, nuevaCancion->track_genre);
-      if (pairGenero == NULL) {
-          List *listaGenero = list_create();
-          list_pushBack(listaGenero, nuevaCancion);
-          map_insert(songGenres, nuevaCancion->track_genre, listaGenero);
-      } else {
-          list_pushBack((List *)pairGenero->value, nuevaCancion);
+      char *token = strtok(linea, ",\n\r");
+      if (token != NULL) {
+          strncpy(nuevaCancion->id, token, 99);
+          nuevaCancion->id[99] = '\0'; // Aseguramos el fin de cadena
       }
 
-      // Insertar en Mapa Artistas
-      MapPair *pairArtista = map_search(songArtist, nuevaCancion->artist);
-      if (pairArtista == NULL) {
-          List *listaArtista = list_create();
-          list_pushBack(listaArtista, nuevaCancion);
-          map_insert(songArtist, nuevaCancion->artist, listaArtista);
-      } else {
-          list_pushBack((List *)pairArtista->value, nuevaCancion);
+      token = strtok(NULL, ",\n\r");
+      if (token != NULL) {
+          strncpy(nuevaCancion->artist, token, 1023);
+          nuevaCancion->artist[1023] = '\0';
       }
 
-      // Insertar en Mapa Tempo
-      char *categoriaTempo;
-      if (nuevaCancion->tempo < 80) categoriaTempo = "Lentas";
-      else if (nuevaCancion->tempo <= 120) categoriaTempo = "Moderadas";
-      else categoriaTempo = "Rapidas";
-
-      MapPair *pairTempo = map_search(songTempo, categoriaTempo);
-      if (pairTempo == NULL) {
-          List *listaTempo = list_create();
-          list_pushBack(listaTempo, nuevaCancion);
-          map_insert(songTempo, categoriaTempo, listaTempo);
-      } else {
-          list_pushBack((List *)pairTempo->value, nuevaCancion);
+      token = strtok(NULL, ",\n\r");
+      if (token != NULL) {
+          strncpy(nuevaCancion->album_name, token, 1023);
+          nuevaCancion->album_name[1023] = '\0';
       }
 
+      token = strtok(NULL, ",\n\r");
+      if (token != NULL) {
+          strncpy(nuevaCancion->track_name, token, 1023);
+          nuevaCancion->track_name[1023] = '\0';
+      }
+
+      token = strtok(NULL, ",\n\r");
+      nuevaCancion->tempo = token ? atoi(token) : 0;
+
+      token = strtok(NULL, ",\n\r");
+      if (token != NULL) {
+          strncpy(nuevaCancion->track_genre, token, 1023);
+          nuevaCancion->track_genre[1023] = '\0';
+      }
+
+      // Como los IDs en el dataset son unicos por defecto, usamos multimap_insert
+      // para una insercion O(1) directa, reduciendo la carga de minutos a segundos.
+      multimap_insert(songId, nuevaCancion->id, nuevaCancion);
       cargadas++;
+
+      // Indicador de progreso visual
+      if (cargadas % 20000 == 0) {
+        printf("Procesando... %d canciones cargadas.\n", cargadas);
+        fflush(stdout);
+      }
   }
 
   fclose(archivo);
   printf("¡Se cargaron %d canciones exitosamente!\n", cargadas);
 }
 
-void mostrarListaCanciones(List *lista) {
-    Song *cancion = (Song *) list_first(lista);
-    if(cancion == NULL){
-      printf("No se encontraron resultados.\n");
-      return;
-    }
-    while (cancion != NULL) {
-        printf("ID: %s | Cancion: %s | Artista: %s | Tempo: %d\n", cancion->id, cancion->track_name, cancion->artist, cancion->tempo);
-        cancion = (Song *) list_next(lista);
-    }
-}
-
-void buscarPorGenero(Map *songGenres){
+// Busqueda secuencial en RAM: Iteramos el mapa maestro filtrando los resultados.
+// Con los TDAs actuales, leer los 114k nodos en memoria toma fracciones de segundo.
+void buscarPorGenero(Map *songId){
   char generoBuscado[50];
-  printf("Por favor ingrese el genero a buscar");
-  scanf(" %[^\n]s", generoBuscado);
-  MapPair *resultado = map_search(songGenres, generoBuscado);
-    if (resultado != NULL) {
-        mostrarListaCanciones((List *)resultado->value);
-    } else {
-        printf("No se encontraron canciones.\n");
-    }
+  printf("Por favor ingrese el genero a buscar: ");
+  scanf(" %[^\n]", generoBuscado);
+
+  int encontrados = 0;
+  MapPair *pair = map_first(songId);
+  while (pair != NULL) {
+      Song *cancion = (Song *)pair->value;
+      if (strcmp(cancion->track_genre, generoBuscado) == 0) {
+          printf("ID: %s | Cancion: %s | Artista: %s | Tempo: %d\n", cancion->id, cancion->track_name, cancion->artist, cancion->tempo);
+          encontrados++;
+      }
+      pair = map_next(songId);
+  }
+
+  if (encontrados == 0) printf("No se encontraron canciones.\n");
+  else printf("-> Se encontraron %d canciones del genero %s.\n", encontrados, generoBuscado);
 }
 
-void buscarPorArtista(Map *songArtist){
+// Filtra las canciones del mapa principal verificando coincidencia exacta del artista
+void buscarPorArtista(Map *songId){
   char artistaBuscado[100];
-    printf("Ingrese el nombre del artista: ");
-    scanf(" %[^\n]s", artistaBuscado);
+  printf("Ingrese el nombre del artista: ");
+  scanf(" %[^\n]", artistaBuscado);
 
-    MapPair *resultado = map_search(songArtist, artistaBuscado);
+  int encontrados = 0;
+  MapPair *pair = map_first(songId);
+  while (pair != NULL) {
+      Song *cancion = (Song *)pair->value;
+      if (strcmp(cancion->artist, artistaBuscado) == 0) {
+          printf("ID: %s | Cancion: %s | Artista: %s | Tempo: %d\n", cancion->id, cancion->track_name, cancion->artist, cancion->tempo);
+          encontrados++;
+      }
+      pair = map_next(songId);
+  }
 
-    if (resultado != NULL) {
-        mostrarListaCanciones((List *) resultado->value);
-    } else {
-        printf("No hay canciones registradas para el artista '%s'.\n", artistaBuscado);
-    }
+  if (encontrados == 0) printf("No hay canciones registradas para '%s'.\n", artistaBuscado);
+  else printf("-> Se encontraron %d canciones de %s.\n", encontrados, artistaBuscado);
 }
 
-void buscarPorTempo(Map *songTempo) {
+// Clasifica e imprime canciones dependiendo del rango de BPM ingresado
+void buscarPorTempo(Map *songId) {
   int opcion;
   printf("\nSeleccione la velocidad:\n");
   printf("1. Lentas (Menos de 80 BPM)\n");
@@ -198,34 +177,45 @@ void buscarPorTempo(Map *songTempo) {
   printf("Opcion: ");
   scanf("%d", &opcion);
 
-  char *categoria;
-    if (opcion == 1) categoria = "Lentas";
-    else if (opcion == 2) categoria = "Moderadas";
-    else if (opcion == 3) categoria = "Rapidas";
-    else {
-        printf("Opcion no valida.\n");
-        return;
-    }
-    MapPair *resultado = map_search(songTempo, categoria);
-    if(resultado != NULL){
-      printf("\n--- Mostrando Canciones %s ---\n", categoria);
-      mostrarListaCanciones((List*) resultado->value);
-    }
-    else{
-      printf("No hay canciones en la categoria %s.\n", categoria);
-    }
+  if (opcion < 1 || opcion > 3) {
+      printf("Opcion no valida.\n");
+      return;
+  }
+
+  int encontrados = 0;
+  MapPair *pair = map_first(songId);
+  while (pair != NULL) {
+      Song *cancion = (Song *)pair->value;
+      int match = 0;
+
+      // Aplicamos la logica del rango dependiendo de la opcion elegida
+      if (opcion == 1 && cancion->tempo < 80) match = 1;
+      else if (opcion == 2 && cancion->tempo >= 80 && cancion->tempo <= 120) match = 1;
+      else if (opcion == 3 && cancion->tempo > 120) match = 1;
+
+      if (match) {
+          printf("ID: %s | Cancion: %s | Artista: %s | Tempo: %d\n", cancion->id, cancion->track_name, cancion->artist, cancion->tempo);
+          encontrados++;
+      }
+      pair = map_next(songId);
+  }
+
+  if (encontrados == 0) printf("No hay canciones en esta categoria.\n");
+  else printf("-> Se listaron %d canciones.\n", encontrados);
 }
 
+// Crea una lista de reproduccion vacia y la guarda en el mapa de playlists
 void crearListaReproduccion(Map *playlists) {
     char nombreLista[100];
     printf("Ingrese un nombre para la nueva lista de reproduccion: ");
-    scanf(" %[^\n]s", nombreLista);
+    scanf(" %[^\n]", nombreLista);
 
     if (map_search(playlists, nombreLista) != NULL) {
         printf("Ya existe una lista con el nombre '%s'.\n", nombreLista);
     } else {
         List *nuevaLista = list_create();
 
+        // Memoria dinamica para la clave del mapa para que no se pierda el string
         char *claveNombre = (char *)malloc(strlen(nombreLista) + 1);
         strcpy(claveNombre, nombreLista);
 
@@ -234,13 +224,14 @@ void crearListaReproduccion(Map *playlists) {
     }
 }
 
+// Vincula un puntero del mapa principal hacia la lista de una playlist
 void agregarCancionALista(Map *songId, Map *playlists) {
     char nombreLista[100];
     char idCancion[100];
 
     printf("Ingrese el nombre de la lista de reproduccion: ");
-    scanf(" %[^\n]s", nombreLista);
-  
+    scanf(" %[^\n]", nombreLista);
+
     MapPair *pairLista = map_search(playlists, nombreLista);
     if (pairLista == NULL) {
         printf("La lista '%s' no existe.\n", nombreLista);
@@ -248,14 +239,16 @@ void agregarCancionALista(Map *songId, Map *playlists) {
     }
 
     printf("Ingrese el ID de la cancion a agregar: ");
-    scanf(" %[^\n]s", idCancion);
+    scanf(" %[^\n]", idCancion);
 
+    // Como los IDs son unicos y exactos, map_search es ideal y rapido aqui
     MapPair *pairCancion = map_search(songId, idCancion);
     if (pairCancion == NULL) {
         printf("La cancion con ID '%s' no existe.\n", idCancion);
         return;
     }
 
+    // Obtenemos los valores y los enlazamos
     List *listaDestino = (List *)pairLista->value;
     Song *cancionAAgregar = (Song *)pairCancion->value;
 
@@ -263,10 +256,11 @@ void agregarCancionALista(Map *songId, Map *playlists) {
     printf("Cancion '%s' agregada exitosamente a '%s'.\n", cancionAAgregar->track_name, nombreLista);
 }
 
+// Recorre e imprime los datos almacenados dentro de una playlist
 void mostrarCancionesDeLista(Map *playlists) {
     char nombreLista[100];
     printf("Nombre de la lista de reproduccion a mostrar: ");
-    scanf(" %[^\n]s", nombreLista);
+    scanf(" %[^\n]", nombreLista);
 
     MapPair *pairLista = map_search(playlists, nombreLista);
     if (pairLista == NULL) {
@@ -277,15 +271,24 @@ void mostrarCancionesDeLista(Map *playlists) {
     printf("\nPlaylist: %s \n", nombreLista);
     List *listaAMostrar = (List *)pairLista->value;
 
-    mostrarListaCanciones(listaAMostrar); 
+    Song *cancion = (Song *) list_first(listaAMostrar);
+    if(cancion == NULL){
+      printf("La lista esta vacia.\n");
+      return;
+    }
+
+    while (cancion != NULL) {
+        printf("ID: %s | Cancion: %s | Artista: %s | Tempo: %d\n", cancion->id, cancion->track_name, cancion->artist, cancion->tempo);
+        cancion = (Song *) list_next(listaAMostrar);
+    }
 }
 
 int main() {
   char opcion; 
+
+  // Optimizacion arquitectonica: Solo instanciamos el mapa maestro y el de listas.
+  // Las busquedas (artista, genero, tempo) se hacen recorriendo iterativamente el mapa.
   Map *songId = map_create(is_equal_str);
-  Map *songGenres = map_create(is_equal_str);
-  Map *songArtist = map_create(is_equal_str);
-  Map *songTempo = map_create(is_equal_str);
   Map *playlists = map_create(is_equal_str);
 
   do {
@@ -295,16 +298,16 @@ int main() {
 
     switch (opcion) {
       case '1':
-        cargarCanciones(songId, songGenres, songArtist, songTempo);
+        cargarCanciones(songId);
         break;
       case '2':
-        buscarPorGenero(songGenres);
+        buscarPorGenero(songId);
         break;
       case '3':
-        buscarPorArtista(songArtist);
+        buscarPorArtista(songId);
         break;
       case '4':
-        buscarPorTempo(songTempo);
+        buscarPorTempo(songId);
         break;
       case '5':
         crearListaReproduccion(playlists);
@@ -326,10 +329,8 @@ int main() {
 
   } while (opcion != '8');
 
+  // Limpieza final de memoria
   map_clean(songId);
-  map_clean(songGenres);
-  map_clean(songArtist);
-  map_clean(songTempo);
   map_clean(playlists);
 
   return 0;

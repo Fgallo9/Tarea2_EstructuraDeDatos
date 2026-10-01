@@ -21,7 +21,7 @@ Esta aplicación en C permite gestionar una amplia base de datos de canciones ca
 
 1. Compila el codigo escribiendo:
    ```bash
-   gcc tdas/*.c tarea2.c -Wno-unused-result -o tarea2
+   gcc -O3 tdas/*.c tarea2.c -Wno-unused-result -o tarea2
    ```
 2. Una vez compilado el programa escribe:
    ```bash
